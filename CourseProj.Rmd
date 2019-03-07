@@ -1,0 +1,31 @@
+---
+title: "LeafletProject"
+author: "Maria Ruchko"
+date: "2/25/2019"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## The map of Oslo transport
+`r date()`
+
+```{r map, echo=FALSE, warning=FALSE, message=FALSE}
+library(leaflet)
+library(stringr)
+#setwd("/Users/maria/Documents/Coursera-R/2018/git/DataProducts")
+cities<-read.csv("worldcities.csv")
+stops<-read.delim("stops.txt",sep=",")
+onlystops<-stops[!is.na(str_extract(stops$stop_id,".:StopPlace:.")),]
+centstops<-onlystops[onlystops$stop_lat>=59.9&onlystops$stop_lat<=60&onlystops$stop_lon>=10.7&onlystops$stop_lon<=10.85,]
+df<-data.frame(name=centstops$stop_name,lat=centstops$stop_lat,lng=centstops$stop_lon,v_type=ifelse(centstops$vehicle_type==1,'tbane',ifelse(centstops$vehicle_type==2,'tog',ifelse(centstops$vehicle_type==3,'bus','trikk'))))
+pal<-colorFactor(c("purple",
+                  "green","brown","blue"),domain=c("tbane","tog","bus","trikk"))
+
+df %>%  leaflet() %>%  addTiles() %>%
+        #%>%addCircles(weight = 1, radius = sqrt(df$pop) * 30)
+addCircleMarkers( clusterOptions = markerClusterOptions(),color=~pal(v_type),stroke = FALSE, fillOpacity = 0.5, popup=paste(df$name,' : ',df$v_type))
+
+```
