@@ -1,0 +1,23 @@
+---
+title: "Data Products - Course Project week 3 - Plotly"
+author: "Maria Palmer"
+date: "3/7/2019"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Employment in Norway
+
+```{r plot, message=FALSE, warning=FALSE, echo=FALSE}
+library(plotly)
+library(plyr)
+employment<-read.csv("employment.csv")
+em<-data.frame(industry=employment$industry..SIC2007.,age=employment$age,sex=employment$sex,num=employment$X07984..Employed.persons.per.4th.quarter..by.region..industry..SIC2007...sex..age..year.and.contents, year=employment$year)
+em<-em[em$age!='15-74 15-74 years',]
+em1<-ddply(em,~year+industry,summarise,num=sum(num))
+plot_ly(em1, x=~year,y=~num, type='bar',hoverinfo=~industry ,color=~substr(industry, 1, 30))%>%layout(yaxis = list(title = 'employed people'), barmode = 'stack',legend = list(x = 100, y = 0.5))
+```
+
